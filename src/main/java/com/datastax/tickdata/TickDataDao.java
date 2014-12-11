@@ -28,7 +28,6 @@ public class TickDataDao {
 	
 	private static Logger logger = LoggerFactory.getLogger(TickDataDao.class);
 
-	private AtomicLong TOTAL_POINTS = new AtomicLong(0);
 	private Session session;
 	private static String keyspaceName = "datastax_tickdata_binary_demo";
 	private static String tableNameTick = keyspaceName + ".tick_data";
@@ -60,9 +59,17 @@ public class TickDataDao {
 		
 		ResultSet resultSet = session.execute(boundStmt);		
 		
-		DoubleArrayList valueArray = new DoubleArrayList();
-		LongArrayList dateArray = new LongArrayList();
+		DoubleArrayList valueArray = new DoubleArrayList(10000);
+		LongArrayList dateArray = new LongArrayList(10000);
 
+		if (resultSet.isExhausted()){
+			logger.info("No results found for symbol : " + symbol);
+			dateArray.trimToSize();
+			valueArray.trimToSize();
+			
+			return new TimeSeries(symbol, dateArray.elements(), valueArray.elements());
+		}
+		
 		Row row = resultSet.one();
 		
 		LongBuffer dates = row.getBytes("dates").asLongBuffer();		
@@ -121,7 +128,7 @@ public class TickDataDao {
 		return;
 	}
 
-	public long getTotalPoints() {
-		return TOTAL_POINTS.get();
+	private String fillNumber(int num) {
+		return num < 10 ? "0" + num : "" + num;
 	}
 }

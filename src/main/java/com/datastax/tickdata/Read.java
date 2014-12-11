@@ -16,7 +16,7 @@ public class Read {
 	public Read() {
 
 		String contactPointsStr = PropertyHelper.getProperty("contactPoints", "localhost");
-		String symbol = PropertyHelper.getProperty("symbol", "AMEX-VWO");
+		String symbol = PropertyHelper.getProperty("symbol", "AMEX-VWO-2014-12-11");
 
 		TickDataDao dao = new TickDataDao(contactPointsStr.split(","));
 		

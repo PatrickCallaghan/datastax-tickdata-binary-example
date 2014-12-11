@@ -30,7 +30,7 @@ The data is generated from a tick generator which uses a csv file to create rand
 To increase the throughput, add nodes to the cluster. Cassandra will scale linearly with the amount of nodes in the cluster.
 
 ## Schema Setup
-Note : This will drop the keyspace "datastax_tickdata_demo" and create a new one. All existing data will be lost. 
+Note : This will drop the keyspace "datastax_tickdata_binary_demo" and create a new one. All existing data will be lost. 
 
 The schema can be found in src/main/resources/cql/
 
@@ -47,7 +47,7 @@ To run the insert
 
 To read a ticker
 
-	mvn clean compile exec:java -Dexec.mainClass="com.datastax.tickdata.Read" (-Dsymbol=NASDAQ-AAPL)
+	mvn clean compile exec:java -Dexec.mainClass="com.datastax.tickdata.Read" (-Dsymbol=NASDAQ-AAPL-2014-12-11)
 
 To remove the tables and the schema, run the following.
 

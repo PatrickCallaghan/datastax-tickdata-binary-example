@@ -1,12 +1,11 @@
 package com.datastax.tickdata.engine;
 
+import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.LongArrayList;
@@ -14,6 +13,8 @@ import cern.colt.list.LongArrayList;
 import com.datastax.timeseries.utils.TimeSeries;
 
 public class TickGenerator implements Iterator<TimeSeries> {
+	
+	private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	
 	private int counter = 0;
 	private List<String> exchangeSymbols;
@@ -49,7 +50,7 @@ public class TickGenerator implements Iterator<TimeSeries> {
 		}
 		counter ++;
 		
-		return new TimeSeries(exchangeSymbol, dates.elements(), prices.elements());
+		return new TimeSeries(exchangeSymbol + "-" + formatter.format(today.toDate()), dates.elements(), prices.elements());
 	}
 
 	@Override

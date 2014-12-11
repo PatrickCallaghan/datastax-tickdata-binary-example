@@ -1,6 +1,5 @@
 package com.datastax.tickdata;
 
-import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -18,12 +17,6 @@ import com.datastax.timeseries.utils.TimeSeries;
 
 public class Main {
 	private static Logger logger = LoggerFactory.getLogger(Main.class);
-
-	private String ONE_MILLION = "1000000";
-	private String TEN_MILLION = "10000000";
-	private String FIFTY_MILLION = "50000000";
-	private String ONE_HUNDRED_MILLION = "100000000";
-	private String ONE_BILLION = "1000000000";
 
 	public Main() {
 
@@ -54,7 +47,6 @@ public class Main {
 		
 		while (tickGenerator.hasNext()){
 			TimeSeries next = tickGenerator.next();
-			logger.info("Adding " + next.getSymbol());
 			
 			try {
 				queue.put(next);
@@ -68,7 +60,7 @@ public class Main {
 		}		
 		
 		timer.end();
-		logger.info("Data Loading took " + timer.getTimeTakenSeconds() + " secs. Total Points " + dao.getTotalPoints() + " (" + (dao.getTotalPoints()/timer.getTimeTakenSeconds()) + " a sec)");
+		logger.info("Data Loading took " + timer.getTimeTakenSeconds() + " secs");
 		
 		System.exit(0);
 	}
