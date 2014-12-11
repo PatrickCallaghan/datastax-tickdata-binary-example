@@ -121,10 +121,6 @@ public class TickDataDao {
 		return;
 	}
 
-	private String fillNumber(int num) {
-		return num < 10 ? "0" + num : "" + num;
-	}
-
 	public long getTotalPoints() {
 		return TOTAL_POINTS.get();
 	}
