@@ -3,6 +3,7 @@ package com.datastax.tickdata.engine;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.DateTime;
@@ -18,6 +19,7 @@ public class TickGenerator implements Iterator<TimeSeries> {
 	
 	private int counter = 0;
 	private List<String> exchangeSymbols;
+	private AtomicLong tickCounter = new AtomicLong(0);
 
 	public TickGenerator(List<String> exchangeSymbols) {
 		this.exchangeSymbols = exchangeSymbols;
@@ -69,7 +71,12 @@ public class TickGenerator implements Iterator<TimeSeries> {
 			lastValue += percentMove;
 		}
 
+		tickCounter.incrementAndGet();
+		
 		return lastValue;
 	}
 
+	public long getCount(){
+		return this.tickCounter.get();
+	}
 }

@@ -6,7 +6,6 @@ import java.nio.LongBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +21,8 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
+import com.datastax.driver.core.policies.TokenAwarePolicy;
 import com.datastax.timeseries.utils.TimeSeries;
 
 public class TickDataDao {
@@ -42,7 +43,9 @@ public class TickDataDao {
 
 	public TickDataDao(String[] contactPoints) {
 
-		Cluster cluster = Cluster.builder().addContactPoints(contactPoints).build();
+		Cluster cluster = Cluster.builder()
+				.withLoadBalancingPolicy(new TokenAwarePolicy(new DCAwareRoundRobinPolicy()))
+				.addContactPoints(contactPoints).build();
 		
 		this.session = cluster.connect();
 
@@ -90,12 +93,9 @@ public class TickDataDao {
 		logger.info("Writing " + timeSeries.getSymbol());
 		
 		BoundStatement boundStmt = new BoundStatement(this.insertStmtTick);
-		List<ResultSetFuture> results = new ArrayList<ResultSetFuture>();
 		
-		TimeSeries mostRecent = null;
-
-		ByteBuffer datesBuffer = ByteBuffer.allocate(10_000_000*8);
-		ByteBuffer pricesBuffer = ByteBuffer.allocate(10_000_000*8);
+		ByteBuffer datesBuffer = ByteBuffer.allocate(4_000_000*8);
+		ByteBuffer pricesBuffer = ByteBuffer.allocate(4_000_000*8);
 		
 		long[] dates = timeSeries.getDates();
 		double[] values = timeSeries.getValues();
@@ -106,21 +106,7 @@ public class TickDataDao {
 			pricesBuffer.putDouble(values[i]);
 		}
 				
-		session.executeAsync(boundStmt.bind(timeSeries.getSymbol(), datesBuffer.flip(), pricesBuffer.flip()));		
-		
-		//Wait till we have everything back.
-		boolean wait = true;
-		while (wait) {
-			// start with getting out, if any results are not done, wait is
-			// true.
-			wait = false;
-			for (ResultSetFuture result : results) {
-				if (!result.isDone()) {
-					wait = true;
-					break;
-				}
-			}
-		}
+		session.execute(boundStmt.bind(timeSeries.getSymbol(), datesBuffer.flip(), pricesBuffer.flip()));		
 		
 		datesBuffer.clear();
 		pricesBuffer.clear();

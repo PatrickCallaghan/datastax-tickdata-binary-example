@@ -1,6 +1,5 @@
 package com.datastax.tickdata;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -27,7 +26,7 @@ public class Main {
 		
 		int noOfThreads = Integer.parseInt(noOfThreadsStr);
 		//Create shared queue 
-		BlockingQueue<TimeSeries> queue = new ArrayBlockingQueue<TimeSeries>(1000);
+		BlockingQueue<TimeSeries> queue = new ArrayBlockingQueue<TimeSeries>(5);
 		
 		//Executor for Threads
 		ExecutorService executor = Executors.newFixedThreadPool(noOfThreads);
@@ -43,7 +42,7 @@ public class Main {
 		List<String> exchangeSymbols = dataLoader.getExchangeData();
 		
 		//Start the tick generator
-		Iterator<TimeSeries> tickGenerator = new TickGenerator(exchangeSymbols);
+		TickGenerator tickGenerator = new TickGenerator(exchangeSymbols);
 		
 		while (tickGenerator.hasNext()){
 			TimeSeries next = tickGenerator.next();
@@ -60,7 +59,7 @@ public class Main {
 		}		
 		
 		timer.end();
-		logger.info("Data Loading took " + timer.getTimeTakenSeconds() + " secs");
+		logger.info("Data Loading took " + timer.getTimeTakenSeconds() + " secs (" + (tickGenerator.getCount()/timer.getTimeTakenSeconds()) + " a sec)");
 		
 		System.exit(0);
 	}
