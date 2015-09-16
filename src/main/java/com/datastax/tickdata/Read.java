@@ -26,7 +26,7 @@ public class Read {
 		TimeSeries timeSeries = dao.getTimeSeries(symbol);
 			
 		timer.end();
-		logger.info("Data Loading took " + timer.getTimeTakenMillis() + " ms. Total Points " + timeSeries.getDates().length);
+		logger.info("Data read took " + timer.getTimeTakenMillis() + " ms. Total Points " + timeSeries.getDates().length);
 		
 		System.exit(0);
 	}
